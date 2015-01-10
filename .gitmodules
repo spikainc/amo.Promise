@@ -1,0 +1,3 @@
+[submodule "vendor/amo.Either"]
+	path = vendor/amo.Either
+	url = git@github.com:amo12937/amo.Either.git

@@ -10,6 +10,7 @@
 		B988460B1A60FB16001B6D4C /* Promise.h in Headers */ = {isa = PBXBuildFile; fileRef = B988460A1A60FB16001B6D4C /* Promise.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B98846111A60FB16001B6D4C /* Promise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B98846051A60FB16001B6D4C /* Promise.framework */; };
 		B98846181A60FB16001B6D4C /* PromiseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98846171A60FB16001B6D4C /* PromiseTests.swift */; };
+		B98846571A61A28B001B6D4C /* Either.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = B98846511A61A244001B6D4C /* Either.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -20,7 +21,42 @@
 			remoteGlobalIDString = B98846041A60FB16001B6D4C;
 			remoteInfo = Promise;
 		};
+		B98846501A61A244001B6D4C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B988464B1A61A244001B6D4C /* Either.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B988462C1A60FB64001B6D4C;
+			remoteInfo = Either;
+		};
+		B98846521A61A244001B6D4C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B988464B1A61A244001B6D4C /* Either.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B98846371A60FB64001B6D4C;
+			remoteInfo = EitherTests;
+		};
+		B98846541A61A25A001B6D4C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B988464B1A61A244001B6D4C /* Either.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B988462B1A60FB64001B6D4C;
+			remoteInfo = Either;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B98846561A61A276001B6D4C /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B98846571A61A28B001B6D4C /* Either.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B98846051A60FB16001B6D4C /* Promise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Promise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -29,6 +65,7 @@
 		B98846101A60FB16001B6D4C /* PromiseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PromiseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B98846161A60FB16001B6D4C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B98846171A60FB16001B6D4C /* PromiseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseTests.swift; sourceTree = "<group>"; };
+		B988464B1A61A244001B6D4C /* Either.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Either.xcodeproj; path = vendor/amo.Either/Either.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +90,7 @@
 		B98845FB1A60FB16001B6D4C = {
 			isa = PBXGroup;
 			children = (
+				B988464B1A61A244001B6D4C /* Either.xcodeproj */,
 				B98846071A60FB16001B6D4C /* Promise */,
 				B98846141A60FB16001B6D4C /* PromiseTests */,
 				B98846061A60FB16001B6D4C /* Products */,
@@ -102,6 +140,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		B988464C1A61A244001B6D4C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B98846511A61A244001B6D4C /* Either.framework */,
+				B98846531A61A244001B6D4C /* EitherTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -124,10 +171,12 @@
 				B98846011A60FB16001B6D4C /* Frameworks */,
 				B98846021A60FB16001B6D4C /* Headers */,
 				B98846031A60FB16001B6D4C /* Resources */,
+				B98846561A61A276001B6D4C /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B98846551A61A25A001B6D4C /* PBXTargetDependency */,
 			);
 			name = Promise;
 			productName = Promise;
@@ -179,6 +228,12 @@
 			mainGroup = B98845FB1A60FB16001B6D4C;
 			productRefGroup = B98846061A60FB16001B6D4C /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = B988464C1A61A244001B6D4C /* Products */;
+					ProjectRef = B988464B1A61A244001B6D4C /* Either.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				B98846041A60FB16001B6D4C /* Promise */,
@@ -186,6 +241,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		B98846511A61A244001B6D4C /* Either.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Either.framework;
+			remoteRef = B98846501A61A244001B6D4C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B98846531A61A244001B6D4C /* EitherTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = EitherTests.xctest;
+			remoteRef = B98846521A61A244001B6D4C /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B98846031A60FB16001B6D4C /* Resources */ = {
@@ -227,6 +299,11 @@
 			isa = PBXTargetDependency;
 			target = B98846041A60FB16001B6D4C /* Promise */;
 			targetProxy = B98846121A60FB16001B6D4C /* PBXContainerItemProxy */;
+		};
+		B98846551A61A25A001B6D4C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Either;
+			targetProxy = B98846541A61A25A001B6D4C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,6 +472,7 @@
 				B988461D1A60FB16001B6D4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B988461E1A60FB16001B6D4C /* Build configuration list for PBXNativeTarget "PromiseTests" */ = {
 			isa = XCConfigurationList;
@@ -403,6 +481,7 @@
 				B98846201A60FB16001B6D4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
