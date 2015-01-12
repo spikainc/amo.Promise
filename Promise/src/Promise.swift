@@ -9,6 +9,8 @@
 import Foundation
 import Either
 
+private let default_queue = dispatch_queue_create("promise default queue", nil)
+
 public class Promise<T> {
     typealias Result = Either<T, NSError>
     typealias Continuation = Result -> ()
@@ -18,10 +20,10 @@ public class Promise<T> {
     
     private let queue: dispatch_queue_t
     
-    public init (_ f: (Result -> ()) -> (), _ queue: dispatch_queue_t? = nil) {
-        self.queue = queue ?? dispatch_get_main_queue()
+    public init (_ f: (deferred: (resolve: T -> (), reject: NSError -> ())) -> (), _ queue: dispatch_queue_t? = nil) {
+        self.queue = queue ?? default_queue
         
-        let resolve = {(result: Result) in
+        let result = {(result: Result) -> () in
             dispatch_async(self.queue, {
                 if self.result != nil {
                     return
@@ -34,18 +36,21 @@ public class Promise<T> {
             })
         }
         
-        dispatch_async(queue, { f(resolve) })
+        let resolve = { (t: T) -> () in result(Result.bind(t)) }
+        let reject = { (e: NSError) -> () in result(Result.bind(e)) }
+        
+        dispatch_async(self.queue, { f(deferred: (resolve, reject)) })
     }
     
     public class func resolve(t: T, _ queue: dispatch_queue_t? = nil) -> Promise<T> {
-        return Promise<T>({resolve in
-            resolve(Result.bind(t))
+        return Promise<T>({deferred in
+            deferred.resolve(t)
         }, queue)
     }
     
     public class func reject(e: NSError, _ queue: dispatch_queue_t? = nil) -> Promise<T> {
-        return Promise<T>({resolve in
-            resolve(Result.bind(e))
+        return Promise<T>({deferred in
+            deferred.reject(e)
         }, queue)
     }
     
@@ -60,16 +65,17 @@ public class Promise<T> {
     }
     
     private func bind<S>(statement: Result -> Either<S, Promise<S>>) -> Promise<S> {
-        return Promise<S>({resolve in
+        return Promise<S>({deferred in
             let f = {(s: S) -> () in
-                resolve(Either<S, NSError>.left(s))
+                deferred.resolve(s)
                 return
             }
             let g = {(p: Promise<S>) -> () in
-                p.bind({res -> Either<Void, Promise<Void>> in
-                    resolve(res)
-                    return Either.bind()
-                })
+                p.then { s in
+                    deferred.resolve(s)
+                }.catch { e in
+                    deferred.reject(e)
+                }
                 return
             }
             let e = Either<S, Promise<S>>.coproduct(f, g)
@@ -114,24 +120,22 @@ public class Promise<T> {
     
     // all
     public class func all(promises: [Promise<T>], _ queue: dispatch_queue_t? = nil) -> Promise<[T]> {
-        return Promise<[T]>({resolve in
+        return Promise<[T]>({deferred in
             var counter = promises.count
-            var result = [T?](count: promises.count, repeatedValue: nil)
+            var values = [T?](count: promises.count, repeatedValue: nil)
             
             for (i, promise) in enumerate(promises) {
                 promise
-                    .then {res -> () in
+                    .then {val -> () in
                         dispatch_async(queue, { () -> Void in
-                            result[i] = res
+                            values[i] = val
                             if --counter == 0 {
-                                resolve(Either<[T], NSError>.bind(result.map { $0! }))
+                                deferred.resolve(values.map { $0! })
                             }
                         })
-                        return
                     }
                     .catch {e -> () in
-                        resolve(Either<[T], NSError>.bind(e))
-                        return
+                        deferred.reject(e)
                     }
             }
         }, queue)
