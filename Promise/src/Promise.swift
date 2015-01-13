@@ -71,11 +71,14 @@ public class Promise<T> {
                 return
             }
             let g = {(p: Promise<S>) -> () in
-                p.then { s in
+                typealias Response = Either<(), Promise<()>>
+                p.bind(Either<S, NSError>.coproduct({ s -> Response in
                     deferred.resolve(s)
-                }.catch { e in
+                    return Response.bind()
+                }, { e -> Response in
                     deferred.reject(e)
-                }
+                    return Response.bind()
+                }))
                 return
             }
             let e = Either<S, Promise<S>>.coproduct(f, g)
@@ -97,7 +100,7 @@ public class Promise<T> {
     
     public func then<S>(thenStatement: T -> Either<S, Promise<S>>) -> Promise<S> {
         let catchStatement = {(e: NSError) -> Either<S, Promise<S>> in
-            Either<S, Promise<S>>.right(Promise<S>.reject(e, self.queue))
+            Either<S, Promise<S>>.bind(Promise<S>.reject(e, self.queue))
         }
         return self.bind(Result.coproduct(thenStatement, catchStatement))
     }
