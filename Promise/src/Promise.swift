@@ -89,6 +89,18 @@ public class Promise<T> {
         }, self.queue)
     }
     
+    public func bind<S>(then tStmt: T -> S, catch cStmt: NSError -> S) -> Promise<S> {
+        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, g: cStmt)))
+    }
+    
+    public func bind<S>(then tStmt: T -> Promise<S>, catch cStmt: NSError -> Promise<S>) -> Promise<S> {
+        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, g: cStmt)))
+    }
+    
+    public func bind<S>(then tStmt: T -> Either<S, Promise<S>>, catch cStmt: NSError -> Either<S, Promise<S>>) -> Promise<S> {
+        return self.bind(Result.coproduct(tStmt, cStmt))
+    }
+    
     // then
     public func then<S>(thenStatement: T -> S) -> Promise<S> {
         return self.then(Either<S, Promise<S>>.bindFunc(thenStatement))
