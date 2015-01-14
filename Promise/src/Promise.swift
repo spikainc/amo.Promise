@@ -18,7 +18,7 @@ public class Promise<T> {
     private var result: Result?
     private var continuations = [Continuation]()
     
-    private let queue: dispatch_queue_t
+    public let queue: dispatch_queue_t
     
     public init (_ f: (deferred: (resolve: T -> (), reject: NSError -> ())) -> (), _ queue: dispatch_queue_t? = nil) {
         self.queue = queue ?? default_queue
@@ -135,6 +135,7 @@ public class Promise<T> {
     
     // all
     public class func all(promises: [Promise<T>], _ queue: dispatch_queue_t? = nil) -> Promise<[T]> {
+        let q = queue ?? default_queue
         return Promise<[T]>({deferred in
             var counter = promises.count
             var values = [T?](count: promises.count, repeatedValue: nil)
@@ -142,7 +143,7 @@ public class Promise<T> {
             for (i, promise) in enumerate(promises) {
                 promise
                     .then {val -> () in
-                        dispatch_async(queue, { () -> Void in
+                        dispatch_async(q, { () -> Void in
                             values[i] = val
                             if --counter == 0 {
                                 deferred.resolve(values.map { $0! })
@@ -153,7 +154,6 @@ public class Promise<T> {
                         deferred.reject(e)
                     }
             }
-        }, queue)
-        
+        }, q)
     }
 }
