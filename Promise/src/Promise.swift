@@ -9,7 +9,7 @@
 import Foundation
 import Either
 
-private let default_queue = dispatch_queue_create("promise default queue", nil)
+public let promise_default_queue = dispatch_queue_create("promise default queue", nil)
 
 public class Promise<T> {
     typealias Result = Either<T, NSError>
@@ -21,7 +21,7 @@ public class Promise<T> {
     public let queue: dispatch_queue_t
     
     public init (_ f: (deferred: (resolve: T -> (), reject: NSError -> ())) -> (), _ queue: dispatch_queue_t? = nil) {
-        self.queue = queue ?? default_queue
+        self.queue = queue ?? promise_default_queue
         
         let result = {(result: Result) -> () in
             dispatch_async(self.queue, {
@@ -135,7 +135,7 @@ public class Promise<T> {
     
     // all
     public class func all(promises: [Promise<T>], _ queue: dispatch_queue_t? = nil) -> Promise<[T]> {
-        let q = queue ?? default_queue
+        let q = queue ?? promise_default_queue
         return Promise<[T]>({deferred in
             var counter = promises.count
             var values = [T?](count: promises.count, repeatedValue: nil)
