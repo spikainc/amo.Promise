@@ -9,7 +9,7 @@
 import Foundation
 import Either
 
-public let promise_default_queue = dispatch_queue_create("promise default queue", nil)
+public let promise_default_queue = dispatch_queue_create("promise default queue", nil)!
 
 public class Promise<T> {
     typealias Result = Either<T, NSError>
@@ -20,7 +20,7 @@ public class Promise<T> {
     
     public let queue: dispatch_queue_t
     
-    public init (_ f: (deferred: (resolve: T -> (), reject: NSError -> ())) -> (), _ queue: dispatch_queue_t? = nil) {
+    public init (_ f: (resolve: T -> (), reject: NSError -> ()) -> (), _ queue: dispatch_queue_t? = nil) {
         self.queue = queue ?? promise_default_queue
         
         let result = {(result: Result) -> () in
@@ -39,17 +39,17 @@ public class Promise<T> {
         let resolve = { (t: T) -> () in result(Result.bind(t)) }
         let reject = { (e: NSError) -> () in result(Result.bind(e)) }
         
-        dispatch_async(self.queue, { f(deferred: (resolve, reject)) })
+        dispatch_async(self.queue, { f(resolve: resolve, reject: reject) })
     }
     
     public class func resolve(t: T, _ queue: dispatch_queue_t? = nil) -> Promise<T> {
-        return Promise<T>({deferred in
+        return Promise({ deferred in
             deferred.resolve(t)
         }, queue)
     }
     
     public class func reject(e: NSError, _ queue: dispatch_queue_t? = nil) -> Promise<T> {
-        return Promise<T>({deferred in
+        return Promise({ deferred in
             deferred.reject(e)
         }, queue)
     }
@@ -90,11 +90,11 @@ public class Promise<T> {
     }
     
     public func bind<S>(then tStmt: T -> S, catch cStmt: NSError -> S) -> Promise<S> {
-        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, g: cStmt)))
+        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, cStmt)))
     }
     
     public func bind<S>(then tStmt: T -> Promise<S>, catch cStmt: NSError -> Promise<S>) -> Promise<S> {
-        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, g: cStmt)))
+        return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, cStmt)))
     }
     
     public func bind<S>(then tStmt: T -> Either<S, Promise<S>>, catch cStmt: NSError -> Either<S, Promise<S>>) -> Promise<S> {
