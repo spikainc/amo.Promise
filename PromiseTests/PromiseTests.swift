@@ -11,7 +11,7 @@ import XCTest
 import Promise
 
 extension XCTestCase {
-    public func async(callback: (() -> ()) -> (), timeout: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * NSEC_PER_SEC))) {
+    public func async(timeout: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * NSEC_PER_SEC)), callback: (() -> ()) -> ()) {
         let semaphore = dispatch_semaphore_create(0)
         let done = {() -> () in
             dispatch_semaphore_signal(semaphore)
@@ -79,7 +79,7 @@ class PromiseTests: XCTestCase {
             }).catch { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
-                XCTAssertEqual(self.error.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
                 done()
             }
             return
@@ -96,7 +96,7 @@ class PromiseTests: XCTestCase {
             }).catch { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
-                XCTAssertEqual(self.error.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
                 done()
             }
         }
@@ -119,7 +119,7 @@ class PromiseTests: XCTestCase {
             Promise<()>.reject(self.error).catch { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
-                XCTAssertEqual(self.error.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
                 done()
             }
             return
@@ -147,7 +147,7 @@ class PromiseTests: XCTestCase {
             }).catch { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
-                XCTAssertEqual(self.error.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
                 done()
             }
             return
@@ -173,7 +173,7 @@ class PromiseTests: XCTestCase {
             }).catch { (actual: NSError) -> () in
                 XCTAssertEqual(self.anotherError.domain, actual.domain)
                 XCTAssertEqual(self.anotherError.code, actual.code)
-                XCTAssertEqual(self.anotherError.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.anotherError.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
                 done()
             }
             return
@@ -194,7 +194,7 @@ class PromiseTests: XCTestCase {
                 XCTAssertEqual(counter, 0)
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
-                XCTAssertEqual(self.error.userInfo!["hoge"] as String, actual.userInfo!["hoge"] as String)
+                XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
             }).then({() -> () in
                 done()
                 return
