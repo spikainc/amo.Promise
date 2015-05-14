@@ -10,7 +10,6 @@
 		B988460B1A60FB16001B6D4C /* Promise.h in Headers */ = {isa = PBXBuildFile; fileRef = B988460A1A60FB16001B6D4C /* Promise.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B98846111A60FB16001B6D4C /* Promise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B98846051A60FB16001B6D4C /* Promise.framework */; };
 		B98846181A60FB16001B6D4C /* PromiseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98846171A60FB16001B6D4C /* PromiseTests.swift */; };
-		B98846571A61A28B001B6D4C /* Either.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = B98846511A61A244001B6D4C /* Either.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B98846591A61A302001B6D4C /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98846581A61A302001B6D4C /* Promise.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,20 +43,6 @@
 			remoteInfo = Either;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		B98846561A61A276001B6D4C /* Copy Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				B98846571A61A28B001B6D4C /* Either.framework in Copy Frameworks */,
-			);
-			name = "Copy Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B98846051A60FB16001B6D4C /* Promise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Promise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -182,7 +167,6 @@
 				B98846011A60FB16001B6D4C /* Frameworks */,
 				B98846021A60FB16001B6D4C /* Headers */,
 				B98846031A60FB16001B6D4C /* Resources */,
-				B98846561A61A276001B6D4C /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
