@@ -72,11 +72,11 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_初期化時に渡した関数内でrejectされた値をcatchで捕捉できる() {
+    func test_初期化時に渡した関数内でrejectされた値をfailで捕捉できる() {
         self.async { done in
             Promise<()>({ deferred in
                 deferred.reject(self.error)
-            }).catch { (actual: NSError) -> () in
+            }).fail { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
                 XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
@@ -86,14 +86,14 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_初期化時に渡した関数内で非同期的にrejectされた値をcatchで捕捉できる() {
+    func test_初期化時に渡した関数内で非同期的にrejectされた値をfailで捕捉できる() {
         self.async { done in
             let queue = dispatch_queue_create("for test", nil)
             Promise<()>({ deferred in
                 dispatch_async(queue, {
                     deferred.reject(self.error)
                 })
-            }).catch { (actual: NSError) -> () in
+            }).fail { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
                 XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
@@ -114,9 +114,9 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_rejectで渡したerrorをcatchで捕捉できる() {
+    func test_rejectで渡したerrorをfailで捕捉できる() {
         self.async { done in
-            Promise<()>.reject(self.error).catch { (actual: NSError) -> () in
+            Promise<()>.reject(self.error).fail { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
                 XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
@@ -127,7 +127,7 @@ class PromiseTests: XCTestCase {
     }
     
     
-    // then, catch を繋げられる
+    // then, fail を繋げられる
     func test_thenで返した新しい値を次のthenで取得できる() {
         self.async { done in
             Promise<Int>.resolve(self.expected).then({ (t: Int) -> String in
@@ -140,11 +140,11 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_thenで返した新しいerrorを次のcatchで捕捉できる() {
+    func test_thenで返した新しいerrorを次のfailで捕捉できる() {
         self.async { done in
             Promise<Int>.resolve(self.expected).then({ (n: Int) -> Promise<()> in
                 return Promise<()>.reject(self.error)
-            }).catch { (actual: NSError) -> () in
+            }).fail { (actual: NSError) -> () in
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)
                 XCTAssertEqual(self.error.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
@@ -154,9 +154,9 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_catchで返した値を次のthenで取得できる() {
+    func test_failで返した値を次のthenで取得できる() {
         self.async { done in
-            Promise<Int>.reject(self.error).catch({ (e: NSError) -> Int in
+            Promise<Int>.reject(self.error).fail({ (e: NSError) -> Int in
                 return self.expected
             }).then { (actual: Int) -> () in
                 XCTAssertEqual(self.expected, actual)
@@ -166,11 +166,11 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_catchで返した新しいerrorを次のcatchで捕捉できる() {
+    func test_failで返した新しいerrorを次のfailで捕捉できる() {
         self.async { done in
-            Promise<()>.reject(self.error).catch({ (e: NSError) -> Promise<()> in
+            Promise<()>.reject(self.error).fail({ (e: NSError) -> Promise<()> in
                 return Promise<()>.reject(self.anotherError)
-            }).catch { (actual: NSError) -> () in
+            }).fail { (actual: NSError) -> () in
                 XCTAssertEqual(self.anotherError.domain, actual.domain)
                 XCTAssertEqual(self.anotherError.code, actual.code)
                 XCTAssertEqual(self.anotherError.userInfo!["hoge"] as! String, actual.userInfo!["hoge"] as! String)
@@ -180,7 +180,7 @@ class PromiseTests: XCTestCase {
         }
     }
     
-    func test_errorが発生した場合catchの前のthenは無視される() {
+    func test_errorが発生した場合failの前のthenは無視される() {
         self.async { done in
             let semaphore = dispatch_semaphore_create(0)
             var counter = 0
@@ -190,7 +190,7 @@ class PromiseTests: XCTestCase {
             }).then({(n: Int) -> () in
                 counter++
                 return
-            }).catch({ (actual: NSError) -> () in
+            }).fail({ (actual: NSError) -> () in
                 XCTAssertEqual(counter, 0)
                 XCTAssertEqual(self.error.domain, actual.domain)
                 XCTAssertEqual(self.error.code, actual.code)

@@ -14,7 +14,7 @@ public let promise_default_queue = dispatch_queue_create("promise default queue"
 public class Promise<T> {
     typealias Result = Either<T, NSError>
     typealias Continuation = Result -> ()
-
+    
     private var result: Result?
     private var continuations = [Continuation]()
     
@@ -89,15 +89,15 @@ public class Promise<T> {
         }, self.queue)
     }
     
-    public func bind<S>(then tStmt: T -> S, catch cStmt: NSError -> S) -> Promise<S> {
+    public func bind<S>(then tStmt: T -> S, fail cStmt: NSError -> S) -> Promise<S> {
         return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, cStmt)))
     }
     
-    public func bind<S>(then tStmt: T -> Promise<S>, catch cStmt: NSError -> Promise<S>) -> Promise<S> {
+    public func bind<S>(then tStmt: T -> Promise<S>, fail cStmt: NSError -> Promise<S>) -> Promise<S> {
         return self.bind(Either<S, Promise<S>>.bindFunc(Result.coproduct(tStmt, cStmt)))
     }
     
-    public func bind<S>(then tStmt: T -> Either<S, Promise<S>>, catch cStmt: NSError -> Either<S, Promise<S>>) -> Promise<S> {
+    public func bind<S>(then tStmt: T -> Either<S, Promise<S>>, fail cStmt: NSError -> Either<S, Promise<S>>) -> Promise<S> {
         return self.bind(Result.coproduct(tStmt, cStmt))
     }
     
@@ -111,26 +111,26 @@ public class Promise<T> {
     }
     
     public func then<S>(thenStatement: T -> Either<S, Promise<S>>) -> Promise<S> {
-        let catchStatement = {(e: NSError) -> Either<S, Promise<S>> in
+        let failStatement = {(e: NSError) -> Either<S, Promise<S>> in
             Either<S, Promise<S>>.bind(Promise<S>.reject(e, self.queue))
         }
-        return self.bind(Result.coproduct(thenStatement, catchStatement))
+        return self.bind(Result.coproduct(thenStatement, failStatement))
     }
     
-    // catch
-    public func catch(catchStatement: NSError -> T) -> Promise<T> {
-        return self.catch(Either<T, Promise<T>>.bindFunc(catchStatement))
+    // fail
+    public func fail(failStatement: NSError -> T) -> Promise<T> {
+        return self.fail(Either<T, Promise<T>>.bindFunc(failStatement))
     }
     
-    public func catch(catchStatement: NSError -> Promise<T>) -> Promise<T> {
-        return self.catch(Either<T, Promise<T>>.bindFunc(catchStatement))
+    public func fail(failStatement: NSError -> Promise<T>) -> Promise<T> {
+        return self.fail(Either<T, Promise<T>>.bindFunc(failStatement))
     }
     
-    public func catch(catchStatement: NSError -> Either<T, Promise<T>>) -> Promise<T> {
+    public func fail(failStatement: NSError -> Either<T, Promise<T>>) -> Promise<T> {
         let thenStatement = {(t: T) -> Either<T, Promise<T>> in
             Either<T, Promise<T>>.left(t)
         }
-        return self.bind(Result.coproduct(thenStatement, catchStatement))
+        return self.bind(Result.coproduct(thenStatement, failStatement))
     }
     
     // all
@@ -140,7 +140,7 @@ public class Promise<T> {
             var counter = promises.count
             var values = [T?](count: promises.count, repeatedValue: nil)
             
-            for (i, promise) in enumerate(promises) {
+            for (i, promise) in promises.enumerate() {
                 promise
                     .then {val -> () in
                         dispatch_async(q, { () -> Void in
@@ -150,7 +150,7 @@ public class Promise<T> {
                             }
                         })
                     }
-                    .catch {e -> () in
+                    .fail {e -> () in
                         deferred.reject(e)
                     }
             }
